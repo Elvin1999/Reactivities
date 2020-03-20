@@ -1,36 +1,28 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Header, Icon, List, Segment } from "semantic-ui-react";
-import { IActivity } from "../models/activity";
+import React, { useEffect, Fragment, useContext } from 'react';
+import { Container } from 'semantic-ui-react';
+import NavBar from '../../features/nav/NavBar';
+import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
+import LoadingComponent from './LoadingComponent';
+import {observer} from 'mobx-react-lite';
+import ActivityStore from '../stores/activityStore';
 
 const App = () => {
-  const [activities, setActivities] = useState<IActivity[]>([]);
+  const activityStore = useContext(ActivityStore)
+
   useEffect(() => {
-    axios
-      .get<IActivity[]>("http://localhost:5000/api/activities")
-      .then(response => {
-        setActivities(response.data);
-      });
-  },[]);
+    activityStore.loadActivities();
+  }, [activityStore]);
+
+  if (activityStore.loadingInitial) return <LoadingComponent content='Loading activities' />
 
   return (
-    <div>
-      <Header as="h2">
-        <Icon name="users" />
-        <Header.Content>Reactivities</Header.Content>
-      </Header>
-      <Segment inverted>
-        <List divided inverted relaxed>
-          {activities.map((activity: IActivity) => (
-            <List.Item key={activity.id}>
-              <List.Content>
-                <List.Header>{activity.title}</List.Header>
-              </List.Content>
-            </List.Item>
-          ))}
-        </List>
-      </Segment>
-    </div>
+    <Fragment>
+      <NavBar />
+      <Container style={{ marginTop: '7em' }}>
+        <ActivityDashboard />
+      </Container>
+    </Fragment>
   );
 };
-export default App;
+
+export default observer(App);
