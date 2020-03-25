@@ -2,7 +2,7 @@ import { observable, action, computed, configure, runInAction } from "mobx";
 import { createContext, SyntheticEvent } from "react";
 import { IActivity } from "../models/activity";
 import agent from "../api/agent";
-
+import { toast } from "react-toastify";
 configure({ enforceActions: "always" });
 
 class ActivityStore {
@@ -51,6 +51,7 @@ class ActivityStore {
       await agent.Activities.create(activity);
       runInAction("create activity", () => {
         this.activityRegistry.set(activity.id, activity);
+        toast.success("Activity created successfully !");
         this.submitting = false;
       });
     } catch (error) {
@@ -69,6 +70,7 @@ class ActivityStore {
         this.activityRegistry.set(activity.id, activity);
         this.activity = activity;
         this.submitting = false;
+        toast.success("Activity edited successfully !");
       });
     } catch (error) {
       runInAction("edit activity error", () => {
@@ -90,6 +92,7 @@ class ActivityStore {
         this.activityRegistry.delete(id);
         this.submitting = false;
         this.target = "";
+        toast.success("Activity deleted successfully !");
       });
     } catch (error) {
       runInAction("delete activity error", () => {
